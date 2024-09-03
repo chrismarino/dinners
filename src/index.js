@@ -51,6 +51,24 @@ app.get('/get-guests', (req, res) => {
   });
 });
 
+app.get('/get-party-details', (req, res) => {
+  const { date } = req.query;
+  fs.readFile('parties.csv', 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading parties.csv', err);
+      res.status(500).send('Internal Server Error');
+    } else {
+      const party = data.trim().split('\n').find(line => line.startsWith(date));
+      if (party) {
+        const [date, guests, guestNames] = party.split(',');
+        res.json({ date, guests, guestNames: guestNames.split(';') });
+      } else {
+        res.status(404).send('Party not found');
+      }
+    }
+  });
+});
+
 app.post('/add-party', (req, res) => {
   const { date, guests } = req.body;
   const guestNames = guests.map(guest => guest.name).join(';');
@@ -72,11 +90,11 @@ app.post('/add-party', (req, res) => {
         return;
       }
 
-      const selectedGuestEmails = new Set(guests.map(guest => guest.email));
+      const selectedGuestNames = new Set(guests.map(guest => guest.name));
 
       const updatedGuests = data.trim().split('\n').map(line => {
         const [name, email, invited, attended] = line.split(',');
-        if (selectedGuestEmails.has(email)) {
+        if (selectedGuestNames.has(name)) {
           return `${name},${email},${parseInt(invited) + 1},${attended}`;
         }
         return line;

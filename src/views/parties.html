@@ -19,8 +19,8 @@
         const guests = await fetchGuests();
         const guestList = guests.map(guest => `
           <div>
-            <input type="checkbox" id="${guest.email}" name="guest" value="${guest.email}">
-            <label for="${guest.email}">${guest.name}</label>
+            <input type="checkbox" id="${guest.name}" name="guest" value="${guest.name}">
+            <label for="${guest.name}">${guest.name}</label>
           </div>
         `).join('');
 
@@ -52,8 +52,7 @@
         .filter(checkbox => checkbox.checked)
         .map(checkbox => {
           const guest = {
-            email: checkbox.value,
-            name: checkbox.nextElementSibling.textContent
+            name: checkbox.value
           };
           return guest;
         });
@@ -82,19 +81,21 @@
       }
     }
 
-    function showDetails(date) {
+    async function showDetails(date) {
+      const response = await fetch(`/get-party-details?date=${date}`);
+      const party = await response.json();
+
       const detailsSection = document.getElementById("detailsSection");
       detailsSection.innerHTML = `
         <h2>Party Details for ${date}</h2>
         <table border="1">
           <thead>
             <tr>
-              <th>Invited Guests</th>
-              <th>Attended</th>
+              <th>Guest Name</th>
             </tr>
           </thead>
           <tbody>
-            <!-- Details will be added here -->
+            ${party.guestNames.map(name => `<tr><td>${name}</td></tr>`).join('')}
           </tbody>
         </table>
       `;
