@@ -92,10 +92,18 @@
           <thead>
             <tr>
               <th>Guest Name</th>
+              <th>Invited Count</th>
+              <th>Attended Count</th>
             </tr>
           </thead>
           <tbody>
-            ${party.guestNames.map(name => `<tr><td>${name}</td></tr>`).join('')}
+            ${party.guests.map(guest => `
+              <tr>
+                <td>${guest.name}</td>
+                <td>${guest.invited}</td>
+                <td>${guest.attended}</td>
+              </tr>
+            `).join('')}
           </tbody>
         </table>
       `;

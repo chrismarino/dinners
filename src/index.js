@@ -61,7 +61,31 @@ app.get('/get-party-details', (req, res) => {
       const party = data.trim().split('\n').find(line => line.startsWith(date));
       if (party) {
         const [date, guests, guestNames] = party.split(',');
-        res.json({ date, guests, guestNames: guestNames.split(';') });
+        const guestNamesArray = guestNames.split(';');
+
+        // Read guests.csv to get invited and attended counts
+        fs.readFile('guests.csv', 'utf8', (err, guestData) => {
+          if (err) {
+            console.error('Error reading guests.csv', err);
+            res.status(500).send('Internal Server Error');
+          } else {
+            const guests = guestData.trim().split('\n').map(line => {
+              const [name, email, invited, attended] = line.split(',');
+              return { name, invited: parseInt(invited), attended: parseInt(attended) };
+            });
+
+            const guestDetails = guestNamesArray.map(name => {
+              const guest = guests.find(g => g.name === name);
+              return {
+                name,
+                invited: guest ? guest.invited : 0,
+                attended: guest ? guest.attended : 0
+              };
+            });
+
+            res.json({ date, guests: guestDetails });
+          }
+        });
       } else {
         res.status(404).send('Party not found');
       }
