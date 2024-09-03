@@ -29,7 +29,9 @@ app.get('/get-parties', (req, res) => {
     } else {
       const parties = data.trim().split('\n').map(line => {
         const [date, guests, guestDetails] = line.split(',');
-        return { date, guests, guestDetails };
+        const guestDetailsArray = guestDetails.split(';');
+        const totalAttended = guestDetailsArray.filter(detail => detail.split(':')[1] === 'true').length;
+        return { date, guests: parseInt(guests), totalAttended };
       });
       res.json(parties);
     }
