@@ -53,7 +53,8 @@ app.get('/get-guests', (req, res) => {
 
 app.post('/add-party', (req, res) => {
   const { date, guests } = req.body;
-  const csvLine = `${date},${guests.length}\n`;
+  const guestNames = guests.map(guest => guest.name).join(';');
+  const csvLine = `${date},${guests.length},${guestNames}\n`;
 
   // Append to parties.csv
   fs.appendFile('parties.csv', csvLine, (err) => {
@@ -71,9 +72,11 @@ app.post('/add-party', (req, res) => {
         return;
       }
 
+      const selectedGuestEmails = new Set(guests.map(guest => guest.email));
+
       const updatedGuests = data.trim().split('\n').map(line => {
         const [name, email, invited, attended] = line.split(',');
-        if (guests.includes(email)) {
+        if (selectedGuestEmails.has(email)) {
           return `${name},${email},${parseInt(invited) + 1},${attended}`;
         }
         return line;
