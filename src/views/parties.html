@@ -6,40 +6,79 @@
   <title>Parties</title>
   <link rel="stylesheet" href="/css/styles.css">
   <script>
-    async function fetchParties() {
-      const response = await fetch('/get-parties');
-      const parties = await response.json();
-      const table = document.getElementById("partiesTable").getElementsByTagName('tbody')[0];
-
-      parties.forEach(party => {
-        const row = table.insertRow();
-        const dateCell = row.insertCell(0);
-        const guestsCell = row.insertCell(1);
-        dateCell.innerHTML = `<a href="#" onclick="showDetails('${party.date}')">${party.date}</a>`;
-        guestsCell.innerHTML = party.guests;
-      });
+    async function fetchGuests() {
+      const response = await fetch('/get-guests');
+      const guests = await response.json();
+      return guests;
     }
 
     async function addParty() {
       const date = prompt("Enter the date (YYYY-MM-DD):");
-      const guests = prompt("Enter the number of guests:");
 
-      if (date && guests) {
+      if (date) {
+        const guests = await fetchGuests();
+        const guestList = guests.map(guest => `
+          <div>
+            <input type="checkbox" id="${guest.email}" name="guest" value="${guest.email}">
+            <label for="${guest.email}">${guest.name}</label>
+          </div>
+        `).join('');
+
+        const guestPopup = document.createElement('div');
+        guestPopup.id = 'guestPopup';
+        guestPopup.style.position = 'fixed';
+        guestPopup.style.top = '50%';
+        guestPopup.style.left = '50%';
+        guestPopup.style.transform = 'translate(-50%, -50%)';
+        guestPopup.style.background = 'gray';
+        guestPopup.style.padding = '20px';
+        guestPopup.style.border = '1px solid black';
+        guestPopup.style.maxHeight = '80%';
+        guestPopup.style.overflowY = 'scroll';
+        guestPopup.innerHTML = `
+          <h2>Select Guests</h2>
+          <form id="guestForm">
+            ${guestList}
+            <button type="button" onclick="submitParty('${date}')">Submit</button>
+          </form>
+        `;
+        document.body.appendChild(guestPopup);
+      }
+    }
+
+    async function submitParty(date) {
+      const form = document.getElementById('guestForm');
+      const selectedGuests = Array.from(form.elements['guest'])
+        .filter(checkbox => checkbox.checked)
+        .map(checkbox => {
+          const guest = {
+            email: checkbox.value,
+            name: checkbox.nextElementSibling.textContent
+          };
+          return guest;
+        });
+
+      if (selectedGuests.length > 0) {
         const table = document.getElementById("partiesTable").getElementsByTagName('tbody')[0];
         const row = table.insertRow();
         const dateCell = row.insertCell(0);
         const guestsCell = row.insertCell(1);
         dateCell.innerHTML = `<a href="#" onclick="showDetails('${date}')">${date}</a>`;
-        guestsCell.innerHTML = guests;
+        guestsCell.innerHTML = selectedGuests.length;
 
-        // Send data to the server to append to parties.csv
+        // Send data to the server to append to parties.csv and update guests.csv
         await fetch('/add-party', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ date, guests }),
+          body: JSON.stringify({ date, guests: selectedGuests }),
         });
+
+        // Remove the popup
+        document.body.removeChild(document.getElementById('guestPopup'));
+      } else {
+        alert('Please select at least one guest.');
       }
     }
 
@@ -59,6 +98,20 @@
           </tbody>
         </table>
       `;
+    }
+
+    async function fetchParties() {
+      const response = await fetch('/get-parties');
+      const parties = await response.json();
+      const table = document.getElementById("partiesTable").getElementsByTagName('tbody')[0];
+
+      parties.forEach(party => {
+        const row = table.insertRow();
+        const dateCell = row.insertCell(0);
+        const guestsCell = row.insertCell(1);
+        dateCell.innerHTML = `<a href="#" onclick="showDetails('${party.date}')">${party.date}</a>`;
+        guestsCell.innerHTML = party.guests;
+      });
     }
 
     window.onload = fetchParties;
