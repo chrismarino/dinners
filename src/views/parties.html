@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parties</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script>
+    async function fetchParties() {
+      const response = await fetch('/get-parties');
+      const parties = await response.json();
+      const table = document.getElementById("partiesTable").getElementsByTagName('tbody')[0];
+
+      parties.forEach(party => {
+        const row = table.insertRow();
+        const dateCell = row.insertCell(0);
+        const guestsCell = row.insertCell(1);
+        dateCell.innerHTML = `<a href="#" onclick="showDetails('${party.date}')">${party.date}</a>`;
+        guestsCell.innerHTML = party.guests;
+      });
+    }
+
+    async function addParty() {
+      const date = prompt("Enter the date (YYYY-MM-DD):");
+      const guests = prompt("Enter the number of guests:");
+
+      if (date && guests) {
+        const table = document.getElementById("partiesTable").getElementsByTagName('tbody')[0];
+        const row = table.insertRow();
+        const dateCell = row.insertCell(0);
+        const guestsCell = row.insertCell(1);
+        dateCell.innerHTML = `<a href="#" onclick="showDetails('${date}')">${date}</a>`;
+        guestsCell.innerHTML = guests;
+
+        // Send data to the server to append to parties.csv
+        await fetch('/add-party', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ date, guests }),
+        });
+      }
+    }
+
+    function showDetails(date) {
+      const detailsSection = document.getElementById("detailsSection");
+      detailsSection.innerHTML = `
+        <h2>Party Details for ${date}</h2>
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Invited Guests</th>
+              <th>Attended</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Details will be added here -->
+          </tbody>
+        </table>
+      `;
+    }
+
+    window.onload = fetchParties;
+  </script>
+</head>
+<body>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/guests">Guests</a>
+    <a href="/parties">Parties</a>
+  </nav>
+  <h1>Parties Page</h1>
+  <button onclick="addParty()">Add Party</button>
+  <table id="partiesTable" border="1">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Guests</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- New rows will be added here -->
+    </tbody>
+  </table>
+  <div id="detailsSection">
+    <!-- Party details will be shown here -->
+  </div>
+</body>
+</html>

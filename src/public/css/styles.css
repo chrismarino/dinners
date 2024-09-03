@@ -1,0 +1,12 @@
+/* src/public/css/styles.css */
+body {
+    background-color: rgb(178, 176, 192);
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+nav a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+}

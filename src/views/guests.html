@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guests</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script>
+    async function fetchGuests() {
+      const response = await fetch('/get-guests');
+      const guests = await response.json();
+      const table = document.getElementById("guestsTable").getElementsByTagName('tbody')[0];
+
+      guests.forEach(guest => {
+        const row = table.insertRow();
+        const nameCell = row.insertCell(0);
+        const emailCell = row.insertCell(1);
+        const invitedCell = row.insertCell(2);
+        const attendedCell = row.insertCell(3);
+        nameCell.innerHTML = guest.name;
+        emailCell.innerHTML = guest.email;
+        invitedCell.innerHTML = guest.invited;
+        attendedCell.innerHTML = guest.attended;
+      });
+    }
+
+    window.onload = fetchGuests;
+  </script>
+</head>
+<body>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/guests">Guests</a>
+    <a href="/parties">Parties</a>
+  </nav>
+  <h1>Guests Page</h1>
+  <table id="guestsTable" border="1">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Parties Invited</th>
+        <th>Parties Attended</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Guest rows will be added here -->
+    </tbody>
+  </table>
+</body>
+</html>
