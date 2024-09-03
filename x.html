@@ -63,8 +63,12 @@
         const row = table.insertRow();
         const dateCell = row.insertCell(0);
         const guestsCell = row.insertCell(1);
+        const totalInvitedCell = row.insertCell(2);
+        const totalAttendedCell = row.insertCell(3);
         dateCell.innerHTML = `<a href="#" onclick="showDetails('${date}')">${date}</a>`;
         guestsCell.innerHTML = selectedGuests.length;
+        totalInvitedCell.innerHTML = selectedGuests.length;
+        totalAttendedCell.innerHTML = 0;
 
         // Send data to the server to append to parties.csv and update guests.csv
         await fetch('/add-party', {
@@ -135,8 +139,12 @@
         const row = table.insertRow();
         const dateCell = row.insertCell(0);
         const guestsCell = row.insertCell(1);
+        const totalInvitedCell = row.insertCell(2);
+        const totalAttendedCell = row.insertCell(3);
         dateCell.innerHTML = `<a href="#" onclick="showDetails('${party.date}')">${party.date}</a>`;
         guestsCell.innerHTML = party.guests;
+        totalInvitedCell.innerHTML = party.guests;
+        totalAttendedCell.innerHTML = party.totalAttended;
       });
     }
 
@@ -156,6 +164,8 @@
       <tr>
         <th>Date</th>
         <th>Guests</th>
+        <th>Total Invited</th>
+        <th>Total Attended</th>
       </tr>
     </thead>
     <tbody>

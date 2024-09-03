@@ -9,6 +9,11 @@
     async function fetchGuests() {
       const response = await fetch('/get-guests');
       const guests = await response.json();
+      return guests;
+    }
+
+    async function displayGuests() {
+      const guests = await fetchGuests();
       const table = document.getElementById("guestsTable").getElementsByTagName('tbody')[0];
 
       guests.forEach(guest => {
@@ -24,7 +29,7 @@
       });
     }
 
-    window.onload = fetchGuests;
+    window.onload = displayGuests;
   </script>
 </head>
 <body>
@@ -44,7 +49,7 @@
       </tr>
     </thead>
     <tbody>
-      <!-- Guest rows will be added here -->
+      <!-- New rows will be added here -->
     </tbody>
   </table>
 </body>
