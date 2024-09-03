@@ -1,12 +1,12 @@
 /* src/public/css/styles.css */
 body {
-    background-color: rgb(178, 176, 192);
-    color: white;
+    background-color: hsla(0, 0%, 100%, 0.856);
+    color: rgba(25, 25, 25, 0.685);
     font-family: Arial, sans-serif;
 }
 
 nav a {
-    color: white;
+    color: rgba(25, 25, 25, 0.685);
     margin: 0 10px;
     text-decoration: none;
 }
